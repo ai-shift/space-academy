@@ -55,7 +55,7 @@ func main() {
 		log.Fatal("Failed to traverse with", err)
 	}
 
-	log.Println("Sorting results", exts)
+	log.Println("Sorting results")
 	keys := make([]string, 0, len(exts))
 	for key := range exts {
 		keys = append(keys, key)
