@@ -34,12 +34,16 @@ func main() {
 	log.Println("Traversing", traversePath)
 	exts := map[string]*ExtInfo{}
 	err = filepath.WalkDir(traversePath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			log.Println("Got previous error", err)
+		}
 		if d.IsDir() {
 			return nil
 		}
 		fi, err := os.Stat(path)
 		if err != nil {
-			return err
+			log.Println("Failed to stat file in", path)
+			return nil
 		}
 		ext := filepath.Ext(path)
 		info, ok := exts[ext]

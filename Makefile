@@ -8,6 +8,7 @@ format:
 
 vet: format
 	go vet ./...
+	staticcheck ./...
 
 run: vet
 	go run $(TRAVERSER_PATH)
