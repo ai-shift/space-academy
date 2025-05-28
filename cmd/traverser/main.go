@@ -17,8 +17,8 @@ const (
 )
 
 type ExtInfo struct {
-	count int
-	size  int64
+	Count int   `json:"count"`
+	Size  int64 `json:"size"`
 }
 
 func main() {
@@ -47,8 +47,8 @@ func main() {
 			info = &ExtInfo{}
 			exts[ext] = info
 		}
-		info.count += 1
-		info.size += fi.Size()
+		info.Count += 1
+		info.Size += fi.Size()
 		return nil
 	})
 	if err != nil {
@@ -61,14 +61,14 @@ func main() {
 		keys = append(keys, key)
 	}
 	sort.SliceStable(keys, func(i, j int) bool {
-		return exts[keys[i]].size > exts[keys[j]].size
+		return exts[keys[i]].Size > exts[keys[j]].Size
 	})
 
 	log.Println("Printing results as a table")
 	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 	fmt.Fprintln(w, "File extension\tCount\tSize")
 	for _, key := range keys {
-		fmt.Fprintf(w, "%s\t%d\t%d\n", key, exts[key].count, exts[key].size)
+		fmt.Fprintf(w, "%s\t%d\t%d\n", key, exts[key].Count, exts[key].Size)
 	}
 	w.Flush()
 
