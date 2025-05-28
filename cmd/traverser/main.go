@@ -16,6 +16,11 @@ const (
 	resultPath = "result.json"
 )
 
+type ExtInfo struct {
+	count int
+	size  int64
+}
+
 func main() {
 	// Parse CLI flags
 	var traversePath string
@@ -27,32 +32,43 @@ func main() {
 	}
 
 	log.Println("Traversing", traversePath)
-	exts := make(map[string]int)
+	exts := make(map[string]*ExtInfo)
 	err = filepath.WalkDir(traversePath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
-		exts[filepath.Ext(path)] += 1
+		fi, err := os.Stat(path)
+		if err != nil {
+			return err
+		}
+		ext := filepath.Ext(path)
+		info, ok := exts[ext]
+		if !ok {
+			info = &ExtInfo{}
+			exts[ext] = info
+		}
+		info.count += 1
+		info.size += fi.Size()
 		return nil
 	})
 	if err != nil {
 		log.Fatal("Failed to traverse with", err)
 	}
 
-	log.Println("Sorting results")
+	log.Println("Sorting results", exts)
 	keys := make([]string, 0, len(exts))
 	for key := range exts {
 		keys = append(keys, key)
 	}
 	sort.SliceStable(keys, func(i, j int) bool {
-		return exts[keys[i]] > exts[keys[j]]
+		return exts[keys[i]].size > exts[keys[j]].size
 	})
 
 	log.Println("Printing results as a table")
 	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
-	fmt.Println("File extension\tAmount")
+	fmt.Fprintln(w, "File extension\tCount\tSize")
 	for _, key := range keys {
-		fmt.Fprintf(w, "%s\t%d\n", key, exts[key])
+		fmt.Fprintf(w, "%s\t%d\t%d\n", key, exts[key].count, exts[key].size)
 	}
 	w.Flush()
 
