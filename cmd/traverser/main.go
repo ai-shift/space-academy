@@ -32,7 +32,7 @@ func main() {
 	}
 
 	log.Println("Traversing", traversePath)
-	exts := make(map[string]*ExtInfo)
+	exts := map[string]*ExtInfo{}
 	err = filepath.WalkDir(traversePath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
